@@ -670,8 +670,12 @@ static bool cb_asmarch(void *user, void *data) {
 
 	// set a default endianness
 	int bigbin = r_bin_is_big_endian (core->bin);
+	int bigcfg = r_config_get_i (core->config, "cfg.bigendian");
 	if (bigbin == -1 /* error: no endianness detected in binary */) {
-		bigbin = r_config_get_i (core->config, "cfg.bigendian");
+		bigbin = bigcfg;
+	} else if (bigbin != bigcfg) { // synchronize cfg endianness
+		r_config_set_i (core->config, "cfg.bigendian", bigbin);
+		eprintf ("cfg.bigendian reset to %d\n", bigbin);
 	}
 
 	// try to set endian of RAsm to match binary
